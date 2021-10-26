@@ -123,7 +123,7 @@ Ipv4DSRRouting::AddHostRouteTo (Ipv4Address dest,
 
 
 
-void 
+void l
 Ipv4DSRRouting::AddNetworkRouteTo (Ipv4Address network, 
                                       Ipv4Mask networkMask, 
                                       Ipv4Address nextHop, 
@@ -454,7 +454,7 @@ Ipv4DSRRouting::PrintRoutingTable (Ptr<OutputStreamWrapper> stream, Time::Unit u
   *os << "Node: " << m_ipv4->GetObject<Node> ()->GetId ()
       << ", Time: " << Now().As (unit)
       << ", Local time: " << m_ipv4->GetObject<Node> ()->GetLocalTime ().As (unit)
-      << ", Ipv4GlobalRouting table" << std::endl;
+      << ", Ipv4DSRRouting table" << std::endl;
 
   if (GetNRoutes () > 0)
     {
