@@ -180,13 +180,6 @@ Ipv4DSRRouting::LookupDSRRoute (Ipv4Address dest, Ptr<NetDevice> oif)
 
 
 
-
-
-
-
-
-
-
   NS_LOG_FUNCTION (this << dest << oif);
   NS_LOG_LOGIC ("Looking for route for destination " << dest);
   Ptr<Ipv4Route> rtentry = 0;
@@ -211,7 +204,7 @@ Ipv4DSRRouting::LookupDSRRoute (Ipv4Address dest, Ptr<NetDevice> oif)
                 }
             }
           allRoutes.push_back (*i);
-          NS_LOG_LOGIC (allRoutes.size () << "Found global host route" << *i); 
+          NS_LOG_LOGIC (allRoutes.size () << "Found dsr host route" << *i); 
         }
     }
   if (allRoutes.size () == 0) // if no host route is found
@@ -234,7 +227,7 @@ Ipv4DSRRouting::LookupDSRRoute (Ipv4Address dest, Ptr<NetDevice> oif)
                     }
                 }
               allRoutes.push_back (*j);
-              NS_LOG_LOGIC (allRoutes.size () << "Found global network route" << *j);
+              NS_LOG_LOGIC (allRoutes.size () << "Found DSR network route" << *j);
             }
         }
     }
