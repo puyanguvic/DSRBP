@@ -703,10 +703,10 @@ DSRRouteManagerImpl::InitializeRoutes ()
   for (NodeList::Iterator i = NodeList::Begin (); i != listEnd; i++)
     {
       Ptr<Node> node = *i;
-//
-// Look for the DSRRouter interface that indicates that the node is
-// participating in routing.
-//
+      //
+      // Look for the DSRRouter interface that indicates that the node is
+      // participating in routing.
+      //
       Ptr<DSRRouter> rtr = 
         node->GetObject<DSRRouter> ();
 
@@ -717,16 +717,80 @@ DSRRouteManagerImpl::InitializeRoutes ()
           continue;
         }
 
-//
-// if the node has a global router interface, then run the global routing
-// algorithms.
-//
-      if (rtr && rtr->GetNumLSAs () )
-        {
-          SPFCalculate (rtr->GetRouterId ());
-        }
+      //
+      // if the node has a DSR router interface, then run the DSR routing
+      // algorithms.
+      //
+        SPFVertex *v;
+        DSRRoutingLSA* w_lsa = 0;
+        DSRRoutingLinkRecord *l = 0;
+        uint32_t numRecordsInVertex = 0;
+        v = new SPFVertex (m_lsdb->GetLSA(rtr->GetRouterId ()));
+        //
+        // V points to a Router-LSA or Network-LSA
+        // Loop over the links in router LSA or attached routers in Network LSA
+        //
+        if (v->GetVertexType () == SPFVertex::VertexRouter)
+          {
+            numRecordsInVertex = v->GetLSA ()->GetNLinkRecords (); 
+          }
+        if (v->GetVertexType () == SPFVertex::VertexNetwork)
+          {
+            numRecordsInVertex = v->GetLSA ()->GetNAttachedRouters (); 
+          }
+        for (uint32_t i = 0; i < numRecordsInVertex; i++)
+          {
+            if (v->GetVertexType () == SPFVertex::VertexRouter) 
+              {
+                NS_LOG_LOGIC ("Examining link " << i << " of " << 
+                      v->GetVertexId () << "'s " <<
+                      v->GetLSA ()->GetNLinkRecords () << " link records");
+              //
+              // (a) If this is a link to a stub network, examine the next link in V's LSA.
+              // Links to stub networks will be considered in the second stage of the
+              // shortest path calculation.
+              //
+                l = v->GetLSA ()->GetLinkRecord (i);
+                NS_ASSERT (l != 0);
+              if (l->GetLinkType () == DSRRoutingLinkRecord::StubNetwork)
+                {
+                  NS_LOG_LOGIC ("Found a Stub record to " << l->GetLinkId ());
+                  continue;
+                }
+              //
+              // (b) Otherwise, W is a transit vertex (router or transit network).  Look up
+              // the vertex W's LSA (router-LSA or network-LSA) in Area A's link state
+              // database. 
+              //
+              if (l->GetLinkType () == DSRRoutingLinkRecord::PointToPoint)
+                {
+                  //
+                  // Lookup the link state advertisement of the new link -- we call it <w> in
+                  // the link state database.
+                  //
+                  w_lsa = m_lsdb->GetLSA (l->GetLinkId ());
+                  NS_ASSERT (w_lsa);
+                  NS_LOG_LOGIC ("Found a P2P record from " << 
+                                v->GetVertexId () << " to " << w_lsa->GetLinkStateId ());
+                  SPFCalculate (w_lsa->GetLinkStateId ());
+                }
+                else if (l->GetLinkType () == 
+                          DSRRoutingLinkRecord::TransitNetwork)
+                  {
+                    w_lsa = m_lsdb->GetLSA (l->GetLinkId ());
+                    NS_ASSERT (w_lsa);
+                    NS_LOG_LOGIC ("Found a Transit record from " << 
+                                  v->GetVertexId () << " to " << w_lsa->GetLinkStateId ());
+                    SPFCalculate (w_lsa->GetLinkStateId ());
+                  }
+                else 
+                  {
+                    NS_ASSERT_MSG (0, "illegal Link Type");
+                  }
+                }
+          }
     }
-  NS_LOG_INFO ("Finished SPF calculation");
+  NS_LOG_INFO ("Finished DSR-SPF calculation");
 }
 
 //
