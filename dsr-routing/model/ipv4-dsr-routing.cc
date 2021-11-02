@@ -171,14 +171,10 @@ Ptr<Ipv4Route>
 Ipv4DSRRouting::LookupDSRRoute (Ipv4Address dest, Ptr<NetDevice> oif)
 {
   /**
-   * 
+   * \author Pu Yang
    * \todo to rewrite the lookup functions to find the best route from the routing table.
    * the routing table in DSR routing is a SPF forest instead of a routing tree in global routing
   */
-
-
-
-
 
   NS_LOG_FUNCTION (this << dest << oif);
   NS_LOG_LOGIC ("Looking for route for destination " << dest);
@@ -257,9 +253,11 @@ Ipv4DSRRouting::LookupDSRRoute (Ipv4Address dest, Ptr<NetDevice> oif)
     }
   if (allRoutes.size () > 0 ) // if route(s) is found
     {
-      // pick up one of the routes uniformly at random if random
-      // ECMP routing is enabled, or always select the first route
-      // consistently if random ECMP routing is disabled
+      /**
+       * \author Pu Yang
+       * \todo pick up one of the routes uniformly at the lowest 
+       * distance. Also need to consider the status of the node's queue
+      */
       uint32_t selectIndex;
       if (m_randomEcmpRouting)
         {

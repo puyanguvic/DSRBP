@@ -14,12 +14,14 @@ def build(bld):
         'model/budget-tag.cc',
         'model/flag-tag.cc',
         'model/timestamp-tag.cc',
+        'model/priority-tag.cc',
         'model/ipv4-dsr-routing.cc',
         'model/dsr-router-interface.cc',
         'model/dsr-route-manager.cc',
         'model/dsr-route-manager-impl.cc',
-        'model/dsr-application.cc',
-        'model/dsr-sink.cc',
+        #'model/dsr-application.cc',
+        #'model/dsr-sink.cc',
+        'model/dsr-virtual-queue-disc.cc',
         'helper/ipv4-dsr-routing-helper.cc',
         ]
 
@@ -41,10 +43,12 @@ def build(bld):
         'model/budget-tag.h',
         'model/flag-tag.h',
         'model/timestamp-tag.h',
+        'model/priority-tag.h',
         'model/ipv4-dsr-routing.h',
         'model/dsr-router-interface.h',
         'model/dsr-route-manager.h',
         'model/dsr-route-manager-impl.h',
+        'model/dsr-virtual-queue-disc.h',
         'helper/ipv4-dsr-routing-helper.h',
         ]
 
