@@ -532,6 +532,71 @@ DSRRouteManagerLSDB::GetLSAByLinkData (Ipv4Address addr) const
 
 // ---------------------------------------------------------------------------
 //
+// DSRRouteManagerNSDB Implementation
+//
+// ---------------------------------------------------------------------------
+
+DSRRouteManagerNSDB::DSRRouteManagerNSDB ()
+  :
+    m_database ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+DSRRouteManagerNSDB::~DSRRouteManagerNSDB ()
+{
+  NS_LOG_FUNCTION (this);
+  NSDBMap_t::iterator i;
+  for (i= m_neighborstatedatabase.begin (); i!= m_neighborstatedatabase.end (); i++)
+    {
+      NS_LOG_LOGIC ("free NetDevice");
+      NetDevice* temp = i->second;
+      delete temp;
+    }
+  NS_LOG_LOGIC ("clear map");
+  m_neighborstatedatabase.clear ();
+}
+
+void
+DSRRouteManagerNSDB::Insert (Ipv4Address addr, NetDevice* netDev)
+{
+  NS_LOG_FUNCTION (this << addr << netDev);
+  m_neighborstatedatabase.insert (NSDBPair_t (addr, netDev));
+}
+
+void
+DSRRouteManagerNSDB::Initialize ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+NetDevice*
+DSRRouteManagerNSDB::GetNetDevice (Ipv4Address addr) const
+{
+  NS_LOG_FUNCTION (this << addr);
+//
+// Look up the NetDevice by its address.
+//
+  NSDBMap_t::const_iterator i;
+  for (i= m_neighborstatedatabase.begin (); i!= m_neighborstatedatabase.end (); i++)
+    {
+      if (i->first == addr)
+        {
+          return i->second;
+        }
+    }
+  return 0;
+}
+
+uint32_t
+DSRRouteManagerNSDB::GetNumNetDevices () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_neighborstatedatabase.size ();
+}
+
+// ---------------------------------------------------------------------------
+//
 // DSRRouteManagerImpl Implementation
 //
 // ---------------------------------------------------------------------------
