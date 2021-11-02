@@ -565,7 +565,7 @@ private:
 };
 
 /**
- * @brief The Link State DataBase (LSDB) of the Global Route Manager.
+ * @brief The Link State DataBase (LSDB) of the DSR Route Manager.
  *
  * Each node in the simulation participating in global routing has a
  * DSRRouter interface.  The primary job of this interface is to export
@@ -697,6 +697,98 @@ private:
  */
   DSRRouteManagerLSDB& operator= (DSRRouteManagerLSDB& lsdb);
 };
+
+/**
+ * @brief The Neighbor State DataBase (NSDB) of the DSR Route Manager.
+ *
+ * Each node in the simulation participating in the DSR rouring has a
+ * list of DSRRouter interface. the NSDB will maintain the neighbor 
+ * state information by pair of <IPv4Address, NetDevice *>
+ */
+class DSRRouteManagerNSDB
+{
+  public:
+  /**
+   * @brief Construct an empty DSR Router Manager Neighbor State Database.
+   *
+   * The database map composing the Neighbor State Database is initialized in
+   * this constructor.
+   */
+  DSRRouteManagerNSDB ();
+
+  /**
+   * @brief Destroy an empty DSR Router Manager Neighbor State Database.
+   *
+   * The database map is walked and all of the Neighbor State Advertisements stored
+   * in the database are freed; then the database map itself is clear ()ed to
+   * release any remaining resources.
+   */
+  ~DSRRouteManagerNSDB ();
+
+  /**
+   * @brief Insert an IP address / NetDevice* pair into the Link
+   * State Database.
+   *
+   * The IPV4 address and the NetDevice* given as parameters are converted
+   * to an STL pair and are inserted into the database map.
+   *
+   * @see NetDevice
+   * @see Ipv4Address
+   * @param addr The IP address associated with the LSA.  Typically the Router 
+   * ID.
+   * @param netDev A pointer to the Link State Advertisement for the router.
+   */
+  void Insert (Ipv4Address addr, NetDevice* netDev);
+
+  /**
+   * @brief Look up the NetDevice* associated with the given
+   * link state ID (address).
+   *
+   * The database map is searched for the given IPV4 address and corresponding
+   * NetDevice* is returned.
+   *
+   * @see NetDevice
+   * @see Ipv4Address
+   * @param addr The IP address associated with the LSA.  Typically the Router 
+   * ID.
+   * @returns A pointer to the NetDevice for the router specified
+   * by the IP address addr.
+   */
+  NetDevice* GetNetDevice (Ipv4Address addr) const;
+
+  /**
+   * @brief This function will build up the NetDevice list for all the node installed
+   * DSRRouter
+   */
+  void Initialize ();
+
+  /**
+   * @brief Get the number of NetDevices.
+   *
+   * @see DSRRoutingLSA
+   * @returns the number of External Link State Advertisements.
+   */
+  uint32_t GetNumNetDevices () const;
+  private:
+  typedef std::map<Ipv4Address, NetDevice*> NSDBMap_t; //!< container of IPv4 addresses / Pointer of NetDevice
+  typedef std::pair<Ipv4Address, NetDevice*> NSDBPair_t; //!< pair of IPv4 addresses / Pointer of NetDevice
+
+  NSDBMap_t m_neighborstatedatabase; //!< database of IPv4 addresses / Link State Advertisements
+  
+/**
+ * @brief DSRRouteManagerLSDB copy construction is disallowed.  There's no 
+ * need for it and a compiler provided shallow copy would be wrong.
+ * @param nsdb object to copy from
+ */
+  DSRRouteManagerNSDB (DSRRouteManagerNSDB& nsdb);
+
+/**
+ * @param nsdb object to copy from
+ * @returns the copied object
+ */
+  DSRRouteManagerNSDB& operator= (DSRRouteManagerNSDB& nsdb);
+}
+
 
 /**
  * @brief A global router implementation.

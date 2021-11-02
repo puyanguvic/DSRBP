@@ -620,7 +620,6 @@ DSRRouteManagerImpl::BuildDSRRoutingDatabase ()
   for (NodeList::Iterator i = NodeList::Begin (); i != listEnd; i++)
     {
       Ptr<Node> node = *i;
-
       Ptr<DSRRouter> rtr = node->GetObject<DSRRouter> ();
 //
 // Ignore nodes that aren't participating in routing.
