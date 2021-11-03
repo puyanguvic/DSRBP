@@ -787,7 +787,7 @@ class DSRRouteManagerNSDB
  * @returns the copied object
  */
   DSRRouteManagerNSDB& operator= (DSRRouteManagerNSDB& nsdb);
-}
+};
 
 
 /**

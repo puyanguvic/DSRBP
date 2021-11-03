@@ -538,7 +538,7 @@ DSRRouteManagerLSDB::GetLSAByLinkData (Ipv4Address addr) const
 
 DSRRouteManagerNSDB::DSRRouteManagerNSDB ()
   :
-    m_database ()
+    m_neighborstatedatabase ()
 {
   NS_LOG_FUNCTION (this);
 }
