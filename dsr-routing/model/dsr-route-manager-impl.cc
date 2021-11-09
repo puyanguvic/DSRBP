@@ -804,6 +804,7 @@ DSRRouteManagerImpl::InitializeRoutes ()
           }
         for (uint32_t i = 0; i < numRecordsInVertex; i++)
           {
+            std::cout << "i= " << i << std::endl;
             if (v->GetVertexType () == SPFVertex::VertexRouter) 
               {
                 NS_LOG_LOGIC ("Examining link " << i << " of " << 
@@ -836,7 +837,7 @@ DSRRouteManagerImpl::InitializeRoutes ()
                   NS_ASSERT (w_lsa);
                   NS_LOG_LOGIC ("Found a P2P record from " << 
                                 v->GetVertexId () << " to " << w_lsa->GetLinkStateId ());
-                  SPFCalculate (w_lsa->GetLinkStateId ());
+                  SPFCalculate (w_lsa->GetLinkStateId (), l->GetMetric (), i+1);
                 }
                 else if (l->GetLinkType () == 
                           DSRRoutingLinkRecord::TransitNetwork)
@@ -845,7 +846,7 @@ DSRRouteManagerImpl::InitializeRoutes ()
                     NS_ASSERT (w_lsa);
                     NS_LOG_LOGIC ("Found a Transit record from " << 
                                   v->GetVertexId () << " to " << w_lsa->GetLinkStateId ());
-                    SPFCalculate (w_lsa->GetLinkStateId ());
+                    SPFCalculate (w_lsa->GetLinkStateId (), l->GetMetric (), i+1);
                   }
                 else 
                   {
@@ -1374,7 +1375,7 @@ void
 DSRRouteManagerImpl::DebugSPFCalculate (Ipv4Address root)
 {
   NS_LOG_FUNCTION (this << root);
-  SPFCalculate (root);
+  // SPFCalculate (root, 1, 1);
 }
 
 //
@@ -1466,10 +1467,10 @@ DSRRouteManagerImpl::CheckForStubNode (Ipv4Address root)
 
 // quagga ospf_spf_calculate
 void
-DSRRouteManagerImpl::SPFCalculate (Ipv4Address root)
+DSRRouteManagerImpl::SPFCalculate (Ipv4Address root, uint32_t init_distance, int32_t Iface)
 {
   NS_LOG_FUNCTION (this << root);
-
+  std::cout << "The interface = " << Iface << std::endl;
   SPFVertex *v;
 //
 // Initialize the Link State Database.
@@ -1493,7 +1494,7 @@ DSRRouteManagerImpl::SPFCalculate (Ipv4Address root)
 // We also mark this vertex as being in the SPF tree.
 //
   m_spfroot= v;
-  v->SetDistanceFromRoot (0);
+  v->SetDistanceFromRoot (init_distance);
   v->GetLSA ()->SetStatus (DSRRoutingLSA::LSA_SPF_IN_SPFTREE);
   NS_LOG_LOGIC ("Starting SPFCalculate for node " << root);
 
@@ -1594,7 +1595,7 @@ DSRRouteManagerImpl::SPFCalculate (Ipv4Address root)
 //
       if (v->GetVertexType () == SPFVertex::VertexRouter)
         {
-          SPFIntraAddRouter (v);
+          SPFIntraAddRouter (v, Iface);
         }
       else if (v->GetVertexType () == SPFVertex::VertexNetwork)
         {
@@ -2061,7 +2062,7 @@ DSRRouteManagerImpl::FindOutgoingInterfaceId (Ipv4Address a, Ipv4Mask amask)
 // route.
 //
 void
-DSRRouteManagerImpl::SPFIntraAddRouter (SPFVertex* v)
+DSRRouteManagerImpl::SPFIntraAddRouter (SPFVertex* v, int32_t Iface)
 {
   NS_LOG_FUNCTION (this << v);
 
@@ -2192,6 +2193,8 @@ DSRRouteManagerImpl::SPFIntraAddRouter (SPFVertex* v)
                        * \author Pu Yang
                        * \brief add host route to routing table
                       */
+                      // gr->AddHostRouteTo (lr->GetLinkData (), nextHop,
+                      //                     Iface, distance);
                       gr->AddHostRouteTo (lr->GetLinkData (), nextHop,
                                           outIf, distance);
                       // gr->AddHostRouteTo (lr->GetLinkData (), nextHop,

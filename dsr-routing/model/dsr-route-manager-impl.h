@@ -879,7 +879,7 @@ private:
    * Equivalent to quagga ospf_spf_calculate
    * \param root the root node
    */
-  void SPFCalculate (Ipv4Address root);
+  void SPFCalculate (Ipv4Address root, uint32_t init_distance, int32_t Iface);
 
   /**
    * \brief Process Stub nodes
@@ -999,7 +999,7 @@ private:
    * \param v the vertex
    *
    */
-  void SPFIntraAddRouter (SPFVertex* v);
+  void SPFIntraAddRouter (SPFVertex* v, int32_t Iface);
 
   /**
    * \brief Add a transit to the routing tables
